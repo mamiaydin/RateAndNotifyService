@@ -2,19 +2,11 @@
 
 namespace RatingService.Models;
 
-public class Rating
+public class Notification
 {
-    [Key]
     [Required]
     public int Id { get; set; }
-    [Required]
-    public int Score { get; set; }
-    [Required]
-    public int ServiceId { get; set; }
-    [Required] 
+    public string Message { get; set; }
     public DateTime CreatedAt { get; set; }
-    [Required]
     public string CreatedIp { get; set; }
-    
-    public Service Service { get; set; }
 }

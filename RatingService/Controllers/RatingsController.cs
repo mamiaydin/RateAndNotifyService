@@ -24,6 +24,12 @@ public class RatingsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RatingReadDto>>> GetRatings()
     {
+        var queueName = "notifications_queue";
+        
+        var producer = new NotificationProducer(queueName);
+        var notification = new Notification { Message = "Hello, world!" };
+        producer.PublishNotification(notification);
+        
         var ratingItems = _ratingRepository.GetAllRatings();
         var ratings = _mapper.Map<IEnumerable<RatingReadDto>>(ratingItems);
         return Ok(ratings);
