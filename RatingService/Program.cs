@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using RatingService;
 using RatingService.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +15,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSwaggerGen();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
+//limiting the IP address request max 20 times in 1 minute
+app.UseMiddleware<RateLimitingMiddleware>(new MemoryCache(new MemoryCacheOptions()), 20, TimeSpan.FromSeconds(60));
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

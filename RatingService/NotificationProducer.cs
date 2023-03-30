@@ -13,6 +13,7 @@ public class NotificationProducer : IDisposable
 
     public NotificationProducer(string queueName)
     {
+        //this informations should be keep in appSettings.json
         var connectionFactory = new ConnectionFactory
         {
             HostName = "localhost",
@@ -27,9 +28,9 @@ public class NotificationProducer : IDisposable
         _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
     }
 
-    public void PublishNotification(Notification notification)
+    public void PublishNotification(RatingNotification ratingNotification)
     {
-        var notificationJson = JsonConvert.SerializeObject(notification);
+        var notificationJson = JsonConvert.SerializeObject(ratingNotification);
         var body = Encoding.UTF8.GetBytes(notificationJson);
 
         var properties = _channel.CreateBasicProperties();

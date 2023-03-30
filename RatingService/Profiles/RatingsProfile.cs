@@ -10,5 +10,6 @@ public class RatingsProfile : Profile
     { 
         CreateMap<Rating, RatingReadDto>();
         CreateMap<RatingCreateDto, Rating>();
+        CreateMap<Rating, RatingNotification>();
     }
 }
