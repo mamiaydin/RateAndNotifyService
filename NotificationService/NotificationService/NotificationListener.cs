@@ -6,7 +6,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 
-//NotificationListener which inherits IDisposable, so we can dispose this class after 
+//NotificationListener which inherits IDisposable, so we can dispose it 
 public class NotificationListener : IDisposable
 {
     private readonly IConnection _connection;
@@ -31,14 +31,14 @@ public class NotificationListener : IDisposable
 
     }
 
-    public void StartListening(Action<RatingNotification> onNotificationReceived)
+    public void StartListening(Action<Rating> onNotificationReceived)
     {
         var consumer = new EventingBasicConsumer(_channel);
         consumer.Received += async (model, args) =>
         {
             var body = args.Body.ToArray();
             var notificationJson = Encoding.UTF8.GetString(body);
-            var notification = JsonConvert.DeserializeObject<RatingNotification>(notificationJson);
+            var notification = JsonConvert.DeserializeObject<Rating>(notificationJson);
             
             if (notification != null) onNotificationReceived(notification);
         };

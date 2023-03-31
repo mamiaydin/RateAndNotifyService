@@ -51,10 +51,26 @@ public class RatingsController : ControllerBase
         var rating = _mapper.Map<Rating>(ratingCreateDto);
         rating.CreatedIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         
-        _ratingRepository.SubmitRating(rating);
+        _ratingRepository.CreateRating(rating);
         _ratingRepository.Save();
         
         var ratingReadDto = _mapper.Map<RatingReadDto>(rating);
+        
+        //push created Rating to the Rabbitmq Queue list that name is "notifications_queue"
+        var producer = new NotificationProducer("notifications_queue");
+        try
+        {
+            producer.PublishNotification(rating);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{ex} : Can't publish notification, check your rabbitmq server!");
+        }
+        finally
+        {
+            producer.Dispose();
+        }
+        
         //return Response Code 201
         return CreatedAtRoute(nameof(GetRatingById), new {ratingReadDto.Id}, ratingReadDto);
     }

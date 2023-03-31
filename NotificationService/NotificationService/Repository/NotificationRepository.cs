@@ -13,21 +13,21 @@ public class NotificationRepository : INotificationRepository
         _context = context;
     }
 
-    public async Task<List<RatingNotification>> GetAllAsync()
+    public async Task<List<Rating>> GetAllAsync()
     {
         return await _context.RatingNotifications.ToListAsync();
     }
 
-    public async Task<List<RatingNotification>> GetNewAsync(DateTime lastAccessTime)
+    public async Task<List<Rating>> GetNewAsync(DateTime lastAccessTime)
     {
         return await _context.RatingNotifications
             .Where(n => n.CreatedAt > lastAccessTime)
             .ToListAsync();
     }
 
-    public async Task AddAsync(RatingNotification ratingNotification)
+    public async Task AddAsync(Rating rating)
     {
-        await _context.RatingNotifications.AddAsync(ratingNotification);
+        await _context.RatingNotifications.AddAsync(rating);
     }
 
     public async Task SaveChangesAsync()

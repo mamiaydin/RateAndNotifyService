@@ -10,5 +10,5 @@ public class AppDbContext : DbContext
         
     }
 
-    public DbSet<RatingNotification> RatingNotifications { get; set; }
+    public DbSet<Rating> RatingNotifications { get; set; }
 }

@@ -4,8 +4,8 @@ namespace NotificationService.Repository;
 
 public interface INotificationRepository
 {
-    Task<List<RatingNotification>> GetAllAsync();
-    Task<List<RatingNotification>> GetNewAsync(DateTime lastAccessTime);
-    Task AddAsync(RatingNotification ratingNotification);
+    Task<List<Rating>> GetAllAsync();
+    Task<List<Rating>> GetNewAsync(DateTime lastAccessTime);
+    Task AddAsync(Rating rating);
     Task SaveChangesAsync();
 }

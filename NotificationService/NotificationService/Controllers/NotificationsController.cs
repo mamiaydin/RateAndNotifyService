@@ -4,35 +4,30 @@ using NotificationService.Services;
 
 namespace NotificationService.Controllers;
 
+[ApiController]
+[Route("api/[controller}")]
 public class NotificationsController : ControllerBase
 {
-    private readonly NotificationListener _listener;
-    private readonly INotificationService _notificationService;
+    private readonly IRatingNotificationService _ratingNotificationService;
     
-    public NotificationsController(INotificationService notificationService)
+    public NotificationsController(IRatingNotificationService ratingNotificationService)
     {
-        _notificationService = notificationService;
-        _listener = new NotificationListener("notifications_queue");
+        _ratingNotificationService = ratingNotificationService;
+    }
+    
+    [HttpGet("new_notifications")]
+    public async Task<ActionResult<List<Rating>>> GetNewNotifications()
+    {
+        // Otherwise, return only the notifications submitted after the last access time
+            var newNotifications = await _ratingNotificationService.GetNewNotificationsAsync();
+            return Ok(newNotifications);
     }
     
     [HttpGet("notifications")]
-    public async Task<ActionResult<List<RatingNotification>>> GetNewNotifications(DateTime? lastAccessTime)
+    public async Task<ActionResult<List<Rating>>> GetAllNotifications()
     {
-
-        
-        if (lastAccessTime == null)
-        {
-            // If no last access time is provided, return all notifications
-            var notifications = await _notificationService.GetAllNotificationsAsync();
-            return Ok(notifications);
-        }
-        else
-        {
-            // Otherwise, return only the notifications submitted after the last access time
-            var newNotifications = await _notificationService.GetNewNotificationsAsync(lastAccessTime.Value);
-            return Ok(newNotifications);
-        }
+        // Otherwise, return only the notifications submitted after the last access time
+        var notifications = await _ratingNotificationService.GetAllNotificationsAsync();
+        return Ok(notifications);
     }
-    
-    
 }

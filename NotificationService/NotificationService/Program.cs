@@ -9,8 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseInMemoryDatabase("InMemoryDb"));
+
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<INotificationService, NotificationConsumerService>();
+builder.Services.AddScoped<IRatingNotificationService, RatingNotificationService>();
+
+builder.Services.AddSingleton<IHostedService, NotificationBackgroundService>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -21,7 +25,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseMiddleware<NotificationMiddleware>("notifications_queue");
 
 if (app.Environment.IsDevelopment())
 {
