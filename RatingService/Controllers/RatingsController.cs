@@ -40,7 +40,7 @@ public class RatingsController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<ActionResult<RatingReadDto>> CreateRating(RatingCreateDto ratingCreateDto)
+    public async Task<ActionResult<RatingReadDto>> SubmitRating(RatingCreateDto ratingCreateDto)
     {
         if (!ModelState.IsValid)
         {
@@ -51,15 +51,16 @@ public class RatingsController : ControllerBase
         var rating = _mapper.Map<Rating>(ratingCreateDto);
         rating.CreatedIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         
-        _ratingRepository.CreateRating(rating);
+        _ratingRepository.SubmitRating(rating);
         _ratingRepository.Save();
         
         var ratingReadDto = _mapper.Map<RatingReadDto>(rating);
+        //return Response Code 201
         return CreatedAtRoute(nameof(GetRatingById), new {ratingReadDto.Id}, ratingReadDto);
     }
     
     [HttpGet("avg/{serviceId:int}")]
-    public async Task<ActionResult<RatingReadDto>> GetAverageRatingByServiceId(int serviceId)
+    public async Task<ActionResult<RatingReadDto>> GetAverageRating(int serviceId)
     {
         var service = _serviceRepository.GetServiceById(serviceId);
         if (service == null) return NotFound("Service not found");

@@ -11,7 +11,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSwaggerGen();
@@ -19,13 +18,16 @@ builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-//limiting the IP address request max 20 times in 1 minute
-app.UseMiddleware<RateLimitingMiddleware>(new MemoryCache(new MemoryCacheOptions()), 20, TimeSpan.FromSeconds(60));
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
+    //swagger initializations for development
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseMiddleware<RateLimitingMiddleware>(new MemoryCache(new MemoryCacheOptions()), 20, TimeSpan.FromSeconds(60));
 }
  
 app.UseHttpsRedirection();
@@ -33,6 +35,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+//feed database
 PreDb.PrepPopulation(app);
 app.Run();

@@ -8,5 +8,5 @@ public interface IRatingRepository
 
     IEnumerable<Rating> GetAllRatings();
     Rating GetRatingById(int id);
-    void CreateRating(Rating rating);
+    void SubmitRating(Rating rating);
 }

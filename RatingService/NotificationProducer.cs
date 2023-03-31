@@ -28,9 +28,9 @@ public class NotificationProducer : IDisposable
         _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
     }
 
-    public void PublishNotification(RatingNotification ratingNotification)
+    public void PublishNotification(Rating rating)
     {
-        var notificationJson = JsonConvert.SerializeObject(ratingNotification);
+        var notificationJson = JsonConvert.SerializeObject(rating);
         var body = Encoding.UTF8.GetBytes(notificationJson);
 
         var properties = _channel.CreateBasicProperties();
