@@ -15,19 +15,32 @@ public class NotificationRepository : INotificationRepository
 
     public async Task<List<Rating>> GetAllAsync()
     {
-        return await _context.RatingNotifications.ToListAsync();
+        var notifications = await _context.RatingNotifications.ToListAsync();
+        return notifications;
     }
 
-    public async Task<List<Rating>> GetNewAsync(DateTime lastAccessTime)
+    public async Task<List<Rating>> GetNewAsync()
     {
+        //get lastTimestamp value from request table so that I can get new notifications after lastTimestamp value
+        var lastRequest = await  _context.NotificationRequests.LastOrDefaultAsync();
+        if (lastRequest == null) return await _context.RatingNotifications.ToListAsync();
+       
+        var lastTimestamp = lastRequest.Timestamp;
         return await _context.RatingNotifications
-            .Where(n => n.CreatedAt > lastAccessTime)
+            .Where(n => n.CreatedAt > lastTimestamp)
             .ToListAsync();
+       
     }
 
     public async Task AddAsync(Rating rating)
     {
         await _context.RatingNotifications.AddAsync(rating);
+    }
+
+    //very ugly code, NotificationRequests should have it's own repository
+    public async Task AddAsync(NotificationRequest request)
+    {
+        await _context.NotificationRequests.AddAsync(request);
     }
 
     public async Task SaveChangesAsync()

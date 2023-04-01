@@ -16,27 +16,36 @@ public class NotificationBackgroundService : IHostedService
         {
             _listener = new NotificationListener("notifications_queue");
         }
-        catch(Exception ex)
+        catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
         {
-            
+           
         }
-       
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _listener.StartListening(async notification =>
-            {
-                using (var scope = _serviceScopeFactory.CreateScope())
+        try
+        {
+            
+            _listener.StartListening(async notification =>
                 {
-                    var notificationService = scope.ServiceProvider.GetService<IRatingNotificationService>();
-                    await notificationService.CreateNotificationAsync(notification);
-                }
+                    using (var scope = _serviceScopeFactory.CreateScope())
+                    {
+                        var notificationService = scope.ServiceProvider.GetService<IRatingNotificationService>();
+                        await notificationService.CreateNotificationAsync(notification);
+                    }
                 
-                Console.WriteLine(notification);
-            }
-        );
-        return Task.CompletedTask;
+                    Console.WriteLine(notification);
+                }
+            );
+            return Task.CompletedTask;
+        }
+        
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An exception occurred while starting the NotificationBackgroundService: {ex}");
+            return Task.FromException(ex);
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

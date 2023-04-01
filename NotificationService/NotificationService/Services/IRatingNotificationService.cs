@@ -4,9 +4,10 @@ namespace NotificationService.Services;
 
 public interface IRatingNotificationService
 {
-    Task<IEnumerable<Rating>> GetAllNotificationsAsync();
+    Task<List<Rating>> GetAllNotificationsAsync();
 
-    Task<IEnumerable<Rating>> GetNewNotificationsAsync();
+    Task<List<Rating>> GetNewNotificationsAsync();
 
     Task CreateNotificationAsync(Rating rating);
+    Task CreateNotificationRequestAsync(NotificationRequest request);
 }

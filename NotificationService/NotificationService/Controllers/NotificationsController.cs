@@ -5,7 +5,7 @@ using NotificationService.Services;
 namespace NotificationService.Controllers;
 
 [ApiController]
-[Route("api/[controller}")]
+[Route("api/[controller]")]
 public class NotificationsController : ControllerBase
 {
     private readonly IRatingNotificationService _ratingNotificationService;
@@ -15,19 +15,18 @@ public class NotificationsController : ControllerBase
         _ratingNotificationService = ratingNotificationService;
     }
     
-    [HttpGet("new_notifications")]
+    [HttpGet]
     public async Task<ActionResult<List<Rating>>> GetNewNotifications()
     {
-        // Otherwise, return only the notifications submitted after the last access time
-            var newNotifications = await _ratingNotificationService.GetNewNotificationsAsync();
-            return Ok(newNotifications);
+        var newNotifications = await _ratingNotificationService.GetNewNotificationsAsync();
+        
+        //create new request in memory db so that I can store Timestamp
+        var newRequest = new NotificationRequest
+            {Guid = new Guid(), NotificationCount = newNotifications.Count, Timestamp = DateTime.Now};
+        await _ratingNotificationService.CreateNotificationRequestAsync(newRequest);
+        
+        return Ok(newNotifications);
     }
     
-    [HttpGet("notifications")]
-    public async Task<ActionResult<List<Rating>>> GetAllNotifications()
-    {
-        // Otherwise, return only the notifications submitted after the last access time
-        var notifications = await _ratingNotificationService.GetAllNotificationsAsync();
-        return Ok(notifications);
-    }
+
 }

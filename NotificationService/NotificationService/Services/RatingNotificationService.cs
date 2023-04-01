@@ -12,27 +12,27 @@ public class RatingNotificationService : IRatingNotificationService
         _notificationRepository = notificationRepository;
     }
 
-    public async Task<IEnumerable<Rating>> GetAllNotificationsAsync()
+    public async Task<List<Rating>> GetAllNotificationsAsync()
     {
         var notifications = await _notificationRepository.GetAllAsync();
         return notifications;
     }
 
-    public async Task<IEnumerable<Rating>> GetNewNotificationsAsync()
+    public async Task<List<Rating>> GetNewNotificationsAsync()
     {
-        var notifications = await _notificationRepository.GetAllAsync();
-        var newNotifications = notifications.Where(x => x.IsNew);
-        foreach (var rating in newNotifications)
-        {
-            rating.IsNew = false;
-        }
-        
-        return newNotifications;
+        var notifications = await _notificationRepository.GetNewAsync();
+        return notifications;
     }
 
     public async Task CreateNotificationAsync(Rating rating)
     {
         await _notificationRepository.AddAsync(rating);
+        await _notificationRepository.SaveChangesAsync();
+    }
+
+    public async Task CreateNotificationRequestAsync(NotificationRequest request)
+    {
+        await _notificationRepository.AddAsync(request);
         await _notificationRepository.SaveChangesAsync();
     }
 }
