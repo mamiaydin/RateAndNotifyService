@@ -4,29 +4,33 @@ using NotificationService.Services;
 
 namespace NotificationService.Controllers;
 
+// This controller handles incoming HTTP GET requests to the "/api/notifications" endpoint
+
 [ApiController]
 [Route("api/[controller]")]
 public class NotificationsController : ControllerBase
 {
-    private readonly IRatingNotificationService _ratingNotificationService;
+    private readonly INotificationService _notificationService;
     
-    public NotificationsController(IRatingNotificationService ratingNotificationService)
+    // Constructor injection is used to provide an instance of the NotificationService
+    public NotificationsController(INotificationService notificationService)
     {
-        _ratingNotificationService = ratingNotificationService;
+        _notificationService = notificationService;
     }
     
+    // This action handles GET requests and returns a list of new notifications
     [HttpGet]
-    public async Task<ActionResult<List<Rating>>> GetNewNotifications()
+    public async Task<ActionResult<List<Notification>>> GetNewNotifications()
     {
-        var newNotifications = await _ratingNotificationService.GetNewNotificationsAsync();
+        // Retrieve new notifications from the NotificationService
+        var newNotifications = await _notificationService.GetNewNotificationsAsync();
         
-        //create new request in memory db so that I can store Timestamp
-        var newRequest = new NotificationRequest
+        // Create a new request in the in-memory database to store the timestamp of when the notifications were retrieved
+        var notificationRequest = new NotificationRequest
             {Guid = new Guid(), NotificationCount = newNotifications.Count, Timestamp = DateTime.Now};
-        await _ratingNotificationService.CreateNotificationRequestAsync(newRequest);
+        await _notificationService.CreateNotificationRequestAsync(notificationRequest);
         
+        // Return the list of new notifications to the client
         return Ok(newNotifications);
     }
-    
-
 }

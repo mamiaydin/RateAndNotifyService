@@ -8,4 +8,5 @@ public class RatingReadDto
     public int Id { get; set; }
     public int Score { get; set; }
     public int ServiceId { get; set; }
+    public double AvgScore { get; set; }
 }

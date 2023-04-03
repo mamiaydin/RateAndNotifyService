@@ -2,12 +2,14 @@
 
 namespace RatingService.Data;
 
-public static class PreDb
+// This is a static class for pre-populating the database with initial data
+public static class PreDb 
 {
+    // This method is called to prepare and populate the database
     public static void PrepPopulation(IApplicationBuilder app)
     {
-        using var serviceScope = app.ApplicationServices.CreateScope();
-        SeedData(serviceScope.ServiceProvider.GetService<AppDbContext>());
+        using var serviceScope = app.ApplicationServices.CreateScope();// Create a service scope to access the database context
+        SeedData(serviceScope.ServiceProvider.GetService<AppDbContext>());// Call SeedData method to seed the database with initial data
     }
 
     private static void SeedData(AppDbContext context)

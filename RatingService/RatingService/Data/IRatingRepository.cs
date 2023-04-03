@@ -4,9 +4,10 @@ namespace RatingService.Data;
 
 public interface IRatingRepository
 {
-    void Save();
+    Task Save();
 
     IEnumerable<Rating> GetAllRatings();
     Rating GetRatingById(int id);
-    void CreateRating(Rating rating);
+    Task CreateRatingAsync(Rating rating);
+    double GetAverageRatingOfService(int serviceId);
 }

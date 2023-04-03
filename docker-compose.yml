@@ -17,20 +17,24 @@ services:
       - rabbit1-data:/var/lib/rabbitmq/
       - rabbit1-logs:/var/log/rabbitmq/
       
-  mongodb_container:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+  ratingservice:
+    build:
+      context: ./RatingService/RatingService
+      dockerfile: Dockerfile
     ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data_container:/data/db
+      - "5196:80"
+      
+  notificationservice:
+    build:
+      context: ./NotificationService/NotificationService
+      dockerfile: Dockerfile
+    ports:
+      - "5025:80"
+
 volumes:
   rabbit1-etc:
   rabbit1-data:
   rabbit1-logs:
-  mongodb_data_container:
 networks:
   default:
     name: rabbit-net

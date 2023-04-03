@@ -14,7 +14,7 @@ public class Rating
     [Required] 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     [Required]
-    public string CreatedIp { get; set; }
+    public string? CreatedIp { get; set; }
     
     public Service Service { get; set; }
 }

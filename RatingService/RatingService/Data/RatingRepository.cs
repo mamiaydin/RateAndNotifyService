@@ -12,9 +12,9 @@ public class RatingRepository:IRatingRepository
         _context = context;
     }
     
-    public void Save()
+    public async Task Save()
     {
-        _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
     }
 
     public IEnumerable<Rating> GetAllRatings()
@@ -27,10 +27,20 @@ public class RatingRepository:IRatingRepository
         return _context.Ratings.FirstOrDefault(x => x.Id == id);
     }
 
-    public void CreateRating(Rating rating)
+    public async Task CreateRatingAsync(Rating rating)
     {
         if (rating == null) throw new ArgumentNullException(nameof(rating));
         
-        _context.Ratings.Add(rating);
+        await _context.Ratings.AddAsync(rating);
+        //save immediately
+        await Save();
+
+    }
+
+    public double GetAverageRatingOfService(int serviceId)
+    {
+        var ratingScores = _context.Ratings.Where(x => x.ServiceId == serviceId);
+        var averageRating = ratingScores.Average(r => r.Score);
+        return averageRating;
     }
 }

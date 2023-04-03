@@ -8,10 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseInMemoryDatabase("InMemoryDb"));
+    options.UseInMemoryDatabase("NotificationDb"));
 
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<IRatingNotificationService, RatingNotificationService>();
+builder.Services.AddScoped<INotificationService, NotificationService.Services.NotificationService>();
 
 builder.Services.AddSingleton<IHostedService, NotificationBackgroundService>();
 
