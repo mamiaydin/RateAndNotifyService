@@ -6,7 +6,11 @@
 - run docker
 - set working directory to RateAndNotifyService `cd RateAndNotifyService`
 - run `docker-compose up [-d]` without -d command we can see that Rabbitmq, RatingService and NotifiyService will open respectively.
+    - Notification Service will run on *http://localhost:5002/swagger/index.html* 
 
+    - Rating Service will run on *http://localhost:5001/swagger/index.html* 
+
+    - RabbitMQ management UI *http://localhost:15672*  Username: `admin`  Password: `password`
 
 ## Notes
 
