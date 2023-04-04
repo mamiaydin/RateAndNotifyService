@@ -201,7 +201,7 @@ I have `NotificationBackgroundService` that listens RabbitMQ server with Notific
 
 If there is available rabbitmq connection and there is notification 'notifications_queue' in rabbitmq queue list, all coming notifications inserting to database. 
 - If there is connection check connection and reconnect to rabbitmq channel at 5 minutes intervals. 
-- If there is no connection try to connect rabbitmq server at 10 seconds intervals
+- If there is no connection try to connect rabbitmq channel at 10 seconds intervals
 
 #### NotificationController `HttpGet` method for the task: *fetch a list of new notifications that have been submitted since the last time the endpoint was called*
 
@@ -235,5 +235,39 @@ If there is no available connection `NotificationListener` retrying to listen ra
 In this case for simplicty I used InMemoryDatabase. **Instead of InMemoryDatabase I suggest that using nosql like mongodb would be better for notification service. Since we don't care data consistency and relational data.**
 
 
+## Maintainability:
 
+- The project uses dependency injection to manage dependencies and improve maintainability.
+- AutoMapper is used to map between DTOs and domain models, reducing the amount of boilerplate code needed for mapping.
+- The use of interfaces and repositories allows for easy swapping of data sources and improves testability.
+- The use of a DbContext and migrations allows for easy database schema changes and versioning.
 
+#### Improvement
+
+- Implementing SOLID principles and design patterns can improve maintainability by making the code more modular and easier to understand and modify.
+- Using code analysis tools and following coding standards can improve code quality and maintainability.
+- Implementing automated testing and continuous integration can improve maintainability by catching errors early and ensuring that changes don't break existing functionality.
+
+## Reliability:
+
+- The use of try-catch blocks and error handling ensures that errors are caught and handled appropriately.
+- The use of RabbitMQ for notifications ensures that notifications are reliably delivered even if the application is down or restarted.
+
+#### Improvement
+
+- Implementing fault tolerance and redundancy can improve reliability by ensuring that the application can continue to function even if certain components fail.
+- Implementing monitoring and logging can improve reliability by allowing for quick identification and resolution of issues.
+- Implementing automated testing and continuous integration can improve reliability by catching errors early and ensuring that changes don't break existing functionality.
+
+## Scalability:
+
+- The use of RabbitMQ for notifications allows for easy scaling of the notification system by adding more consumers.
+- The use of asynchronous methods and tasks allows for better performance and scalability by freeing up threads to handle other requests.
+
+#### Improvement
+
+- Implementing load balancing and horizontal scaling can improve scalability by allowing the application to handle more requests and traffic.
+- Implementing caching and optimizing database queries can improve scalability by reducing the load on the database.
+- Implementing asynchronous and event-driven architectures can improve scalability by allowing the application to handle more requests and events without blocking.
+
+# Thank you for your time :)
