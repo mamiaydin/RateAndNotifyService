@@ -1,6 +1,14 @@
 # Service Provider Ratings and Notifications
 
-RabbitMQ is an open-source message broker that implements the AMQP protocol and allows for message exchange between different systems.
+## How to Run
+- download docker and docker-compose
+- clone this repository
+- run docker
+- set working directory to RateAndNotifyService `cd RateAndNotifyService`
+- run `docker-compose up [-d]` without -d command we can see that Rabbitmq, RatingService and NotifiyService will open respectively.
+
+
+## Notes
 
 - I used RabbitMQ to allow services to communicate with each other. The first service, called the **RatingService** as a producer, sends messages to a RabbitMQ exchange, while the second service, called the **NotificationService** , subscribes to the exchange to receive messages.
 
@@ -11,6 +19,10 @@ RabbitMQ is an open-source message broker that implements the AMQP protocol and 
 - I include OpenAPI(Swagger) for both services.
 
 - I used xUnit and Moq libraries for unit tests. I kept short unit tests for simplicity.
+
+## Tests
+`cd RatingService` or `cd NotificationService`
+run `dotnet test`
 
 
 ## Rating Service
@@ -25,7 +37,6 @@ and notify the notification service when a new rating is submitted.
 ### RatingsController `HttpPost` method for the task: *Allows users to submit a rating for a service provider and fetch the
 average rating for a specific service provider.*
 
-    // This is the HTTP POST endpoint for submitting a new rating for a service
     public async Task<ActionResult<RatingReadDto>> SubmitRating(RatingCreateDto ratingCreateDto)
     {
         // Get the service by ID from the service repository
@@ -44,7 +55,7 @@ average rating for a specific service provider.*
         var rating = _mapper.Map<Rating>(ratingCreateDto);
 
         // Set the IP address of the client that submitted the rating
-        rating.CreatedIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        if (HttpContext != null) rating.CreatedIp = HttpContext.Connection.RemoteIpAddress?.ToString();
 
         // Save the new rating to the rating repository
         await _ratingRepository.CreateRatingAsync(rating);
@@ -67,6 +78,8 @@ average rating for a specific service provider.*
         }
         catch (Exception ex)
         {
+            //todo Handle return result
+            
             // If an error occurs while publishing the notification, log the error message to the console
             Console.WriteLine($"{ex} : Can't publish notification, check your rabbitmq server!");
         }
@@ -182,11 +195,13 @@ public class RateLimitingMiddleware
 **Task:** Allows clients to fetch a list of new notifications that have been
 submitted since the last time the endpoint was called.
 
-I have `NotificationBackgroundService` that listens RabbitMQ server with NotificationListener class in background as a singleton object IHostedService.
+I have `NotificationBackgroundService` that listens RabbitMQ server with NotificationListener class in background as a HostedService.
 
-`builder.Services.AddSingleton<IHostedService, NotificationBackgroundService>();`
+`builder.Services.AddHostedService<NotificationBackgroundService>();`
 
-If there is available rabbitmq connection and there is notification 'notifications_queue' in rabbitmq queue list, all coming notifications inserting to database.
+If there is available rabbitmq connection and there is notification 'notifications_queue' in rabbitmq queue list, all coming notifications inserting to database. 
+- If there is connection check connection and reconnect to rabbitmq channel at 5 minutes intervals. 
+- If there is no connection try to connect rabbitmq server at 10 seconds intervals
 
 #### NotificationController `HttpGet` method for the task: *fetch a list of new notifications that have been submitted since the last time the endpoint was called*
 
@@ -197,10 +212,11 @@ If there is available rabbitmq connection and there is notification 'notificatio
         
         // Create a new request in the in-memory database to store the timestamp of when the notifications were retrieved
         var notificationRequest = new NotificationRequest
-            {Guid = new Guid(), NotificationCount = newNotifications.Count, Timestamp = DateTime.Now};
+            {Guid = Guid.NewGuid(), NotificationCount = 0, Timestamp = DateTime.Now};
         await _notificationService.CreateNotificationRequestAsync(notificationRequest);
         
         // Return the list of new notifications to the client
+        if (!newNotifications.Any()) return Ok("Notifications empty..");
         return Ok(newNotifications);
     }
 
