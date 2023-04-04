@@ -16,22 +16,7 @@ public class NotificationBackgroundService : BackgroundService
         _serviceScopeFactory = serviceScopeFactory;
         _cancellationTokenSource = new CancellationTokenSource();
     }
-
-    // This method is called when the background service is started.
-    // It starts listening for notifications and returns a Task object that represents the ongoing operation.
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        
-        return Task.CompletedTask;
-    }
-
-    // This method is called when the background service is stopped.
-    // It stops listening for notifications and returns a Task object that represents the ongoing operation.
-    public override Task StopAsync(CancellationToken cancellationToken)
-    {
-        StopListening();
-        return Task.CompletedTask;
-    }
+    
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)  
     {  
@@ -53,30 +38,22 @@ public class NotificationBackgroundService : BackgroundService
                     var notificationService = scope.ServiceProvider.GetService<INotificationService>();
                     // Call the CreateNotificationAsync method to create a new notification.
                     await notificationService.CreateNotificationAsync(notification);
+                    
                     Console.WriteLine($"Received notification: {notification}");
-                    // Do something with the received notification, such as logging it or processing it
+                    
                 },listeningCancellationTokenSource.Token);
                 
-                //if Consuming starts, runs backgroundservice at 3 min intervals because data is incosistent 
                 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while processing notifications: {ex}");
-                // handle the error here, maybe logging it or sending an email etc
+                // do nothing
             }
-
+            //runs background service 10 seconds intervals
             await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
         }
         
     }  
-
-
-    // This method stops listening for notifications.
-    private void StopListening()
-    {
-        _cancellationTokenSource.Cancel(); // Cancel the cancellation token source.
-        _listener.Dispose(); // Dispose of the notification listener object.
-        Console.WriteLine("Listening stopped"); // Output a message to the console.
-    }
+    
 }

@@ -82,6 +82,8 @@ public class RatingController : ControllerBase
         }
         catch (Exception ex)
         {
+            //todo Handle return result
+            
             // If an error occurs while publishing the notification, log the error message to the console
             Console.WriteLine($"{ex} : Can't publish notification, check your rabbitmq server!");
         }
