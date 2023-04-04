@@ -231,7 +231,7 @@ AddScoped method is used to register the services with a scoped lifetime. This m
 
 
 
-If there is no available connection `NotificationListener` retrying to listen rabbitmq server 5 seconds delay.
+If there is no available connection `NotificationListener` retrying to listen rabbitmq server 10 seconds delay.
 In this case for simplicty I used InMemoryDatabase. **Instead of InMemoryDatabase I suggest that using nosql like mongodb would be better for notification service. Since we don't care data consistency and relational data.**
 
 
