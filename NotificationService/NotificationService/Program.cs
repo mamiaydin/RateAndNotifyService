@@ -13,7 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService.Services.NotificationService>();
 
-builder.Services.AddSingleton<IHostedService, NotificationBackgroundService>();
+builder.Services.AddHostedService<NotificationBackgroundService>();
 
 builder.Services.AddControllers();
 

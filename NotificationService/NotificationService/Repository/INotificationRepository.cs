@@ -8,4 +8,5 @@ public interface INotificationRepository
     Task AddAsync(Notification notification);
     Task AddAsync(NotificationRequest request);
     Task SaveChangesAsync();
+    void UpdateAsync(Notification notification);
 }

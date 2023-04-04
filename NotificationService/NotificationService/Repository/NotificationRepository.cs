@@ -21,7 +21,7 @@ public class NotificationRepository : INotificationRepository
         if (lastRequest == null) return await _context.Notifications.ToListAsync();
 
         var notifications = _context.Notifications;
-        var testnotifications = _context.Notifications.ToList();
+        
         var lastTimestamp = lastRequest.Timestamp;
         return await notifications
             .Where(n => n.CreatedAt > lastTimestamp)
@@ -43,5 +43,12 @@ public class NotificationRepository : INotificationRepository
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+
+
+    public void UpdateAsync(Notification notification)
+    {
+         _context.Notifications.Update(notification);
     }
 }

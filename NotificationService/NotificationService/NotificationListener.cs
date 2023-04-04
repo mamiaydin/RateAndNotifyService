@@ -17,9 +17,11 @@ public class NotificationListener : IDisposable
     {
         // Establish a connection to the RabbitMQ server using the specified queue name
         // This information should be kept in appSettings.json instead of being hardcoded here
+        var rabbitHostName = Environment.GetEnvironmentVariable("RABBIT_HOSTNAME");
         var connectionFactory = new ConnectionFactory
         {
-            HostName = "localhost",
+            HostName = rabbitHostName ?? "localhost",
+            Port = 5672,
             UserName = "admin",
             Password = "password"
         };
@@ -37,13 +39,13 @@ public class NotificationListener : IDisposable
         catch (Exception ex)
         {
             Console.WriteLine($"An error occurred while creating the NotificationListener: {ex}");
-            // handle the error here, maybe logging it or sending an email etc
+            // notification data is inconsistent
         }
 
     }
 
     // Start listening for notifications on the RabbitMQ server
-    public void StartListening(Action<Notification> onNotificationReceived)
+    public async Task StartListening(Action<Notification> onNotificationReceived, CancellationToken cancellationToken)
     {
         try
         {
@@ -61,6 +63,9 @@ public class NotificationListener : IDisposable
 
             // Start consuming messages from the specified queue on the RabbitMQ server
             _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);
+            
+            // Wait for 5 minutes before cancelling the method
+            await Task.Delay(TimeSpan.FromMinutes(5), cancellationToken);
         }
         catch (Exception ex)
         {

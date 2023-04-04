@@ -27,10 +27,11 @@ public class NotificationsController : ControllerBase
         
         // Create a new request in the in-memory database to store the timestamp of when the notifications were retrieved
         var notificationRequest = new NotificationRequest
-            {Guid = new Guid(), NotificationCount = newNotifications.Count, Timestamp = DateTime.Now};
+            {Guid = Guid.NewGuid(), NotificationCount = 0, Timestamp = DateTime.Now};
         await _notificationService.CreateNotificationRequestAsync(notificationRequest);
         
         // Return the list of new notifications to the client
+        if (!newNotifications.Any()) return Ok("Notifications empty..");
         return Ok(newNotifications);
     }
 }

@@ -3,7 +3,7 @@ using NotificationService.Services;
 namespace NotificationService;
 
 // This class implements the IHostedService interface and defines a background service for listening to notifications.
-public class NotificationBackgroundService : IHostedService
+public class NotificationBackgroundService : BackgroundService
 {
     private NotificationListener _listener; // The notification listener object.
     private readonly IServiceScopeFactory _serviceScopeFactory; // The service scope factory object.
@@ -21,51 +21,56 @@ public class NotificationBackgroundService : IHostedService
     // It starts listening for notifications and returns a Task object that represents the ongoing operation.
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        StartListening();
+        
         return Task.CompletedTask;
     }
 
     // This method is called when the background service is stopped.
     // It stops listening for notifications and returns a Task object that represents the ongoing operation.
-    public Task StopAsync(CancellationToken cancellationToken)
+    public override Task StopAsync(CancellationToken cancellationToken)
     {
         StopListening();
         return Task.CompletedTask;
     }
-
-    // This method starts listening for notifications.
-    private void StartListening()
-    {
-        // This code runs in a background thread.
-        Task.Run(() =>
+    
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)  
+    {  
+        
+        while (!stoppingToken.IsCancellationRequested)
         {
-            while (!_cancellationTokenSource.IsCancellationRequested)
+            try
             {
-                try
+                Console.WriteLine("Starting NotificationListener...");
+                _listener = new NotificationListener("notifications_queue");
+                
+                // Create a new cancellation token for this iteration
+                using var listeningCancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(5));
+                await _listener.StartListening(async (notification) =>
                 {
-                    // Create a new notification listener object and start listening for notifications.
-                    _listener = new NotificationListener("notifications_queue");
-                    _listener.StartListening(async notification =>
-                    {
-                        // Use the service scope factory to create a new service scope.
-                        using var scope = _serviceScopeFactory.CreateScope();
-                        // Get an instance of the notification service from the service provider.
-                        var notificationService = scope.ServiceProvider.GetService<INotificationService>();
-                        // Call the CreateNotificationAsync method to create a new notification.
-                        await notificationService.CreateNotificationAsync(notification);
-                    });
-
-                    Console.WriteLine("Listening started");
-                    break;
-                }
-                catch (RabbitMQ.Client.Exceptions.BrokerUnreachableException ex)
-                {
-                    Console.WriteLine("Connection failed, retrying in 5 seconds"); // Output an error message to the console.
-                    Thread.Sleep(TimeSpan.FromSeconds(5)); // Wait for 5 seconds before retrying.
-                }
+                    // Use the service scope factory to create a new service scope.
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    // Get an instance of the notification service from the service provider.
+                    var notificationService = scope.ServiceProvider.GetService<INotificationService>();
+                    // Call the CreateNotificationAsync method to create a new notification.
+                    await notificationService.CreateNotificationAsync(notification);
+                    Console.WriteLine($"Received notification: {notification}");
+                    // Do something with the received notification, such as logging it or processing it
+                },listeningCancellationTokenSource.Token);
+                
+                //if Consuming starts, runs backgroundservice at 3 min intervals because data is incosistent 
+                
             }
-        }, _cancellationTokenSource.Token);
-    }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while processing notifications: {ex}");
+                // handle the error here, maybe logging it or sending an email etc
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+        }
+        
+    }  
+
 
     // This method stops listening for notifications.
     private void StopListening()
